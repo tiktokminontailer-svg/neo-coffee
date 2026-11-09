@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#F7F0E4">
 <meta name="claude:viewport-fit-sides" content="cover">
 <script>document.documentElement.classList.add("js")</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" defer></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&display=swap">
 <style>
 /* Layout: full-bleed bands alternating ink and paper. Hero lockup from the client's logo files, line-art cup with steam, grain on dark bands. Single committed look, monochrome plus one crema tone. */
@@ -813,17 +814,12 @@ html:not(.js) .nojsbar{position:fixed;left:max(12px,env(safe-area-inset-left,0px
 
 <div class="ov" id="authOv" hidden>
   <form class="modal lt" id="authForm" novalidate role="dialog" aria-modal="true" aria-labelledby="authTitle">
-    <h3 id="authTitle">Вход</h3>
-    <div class="soc" id="socBox"><label class="chk" style="margin:0"><input type="checkbox" id="socAgree"><span>Я даю <a href="#" data-legal="consent">согласие на обработку персональных данных</a> и ознакомлен с <a href="#" data-legal="policy">Политикой</a></span></label><button class="btn soc-vk" type="button" data-soc="VK ID">Войти через VK ID</button><button class="btn soc-ml" type="button" data-soc="Mail.ru">Войти через Mail.ru</button><p class="note">Демо: настоящий вход через VK и Mail.ru подключается на сервере. Здесь он только показывает, как это будет выглядеть.</p><p class="or"><span>или по телефону</span></p></div>
-    <div class="seg" style="margin-bottom:16px">
-      <label><input type="radio" name="mode" value="login" checked><span>Вход</span></label>
-      <label><input type="radio" name="mode" value="reg"><span>Регистрация</span></label>
-    </div>
-    <div class="field" id="nameF" hidden><label for="aName">Имя</label><input id="aName" autocomplete="name"></div>
-    <div class="field"><label for="aPhone">Телефон</label><input id="aPhone" type="tel" inputmode="tel" placeholder="+7 900 000-00-00" autocomplete="tel"></div>
-    <div class="field" id="mailF" hidden><label for="aMail">Почта</label><input id="aMail" type="email" inputmode="email" placeholder="name@mail.ru" autocomplete="email"></div>
-    <div class="field"><label for="aPass">Пароль</label><input id="aPass" type="password" autocomplete="current-password"></div>
-    <label class="chk" id="agreeF" hidden><input type="checkbox" id="aAgree"><span>Я даю <a href="#" data-legal="consent">согласие на обработку персональных данных</a> и ознакомлен с <a href="#" data-legal="policy">Политикой</a></span></label>
+    <h3 id="authTitle">Вход по почте</h3>
+    <div class="soc" id="socBox"><label class="chk" style="margin:0"><input type="checkbox" id="socAgree"><span>Я даю <a href="#" data-legal="consent">согласие на обработку персональных данных</a> и ознакомлен с <a href="#" data-legal="policy">Политикой</a></span></label><button class="btn soc-vk" type="button" data-soc="VK ID">Войти через VK ID</button><button class="btn soc-ml" type="button" data-soc="Mail.ru">Войти через Mail.ru</button><p class="note">Демо: настоящий вход через VK и Mail.ru подключается на сервере. Здесь он только показывает, как это будет выглядеть.</p><p class="or"><span>или по почте</span></p></div>
+    <div class="field"><label for="aMail">Почта</label><input id="aMail" type="email" inputmode="email" placeholder="name@mail.ru" autocomplete="email"></div>
+    <div class="field" id="nameF"><label for="aName">Имя</label><input id="aName" autocomplete="name"></div>
+    <div class="field" id="phoneF"><label for="aPhone">Телефон для связи по заказу</label><input id="aPhone" type="tel" inputmode="tel" placeholder="+7 900 000-00-00" autocomplete="tel"></div>
+    <label class="chk" id="agreeF"><input type="checkbox" id="aAgree"><span>Я даю <a href="#" data-legal="consent">согласие на обработку персональных данных</a> и ознакомлен с <a href="#" data-legal="policy">Политикой</a></span></label>
     <div class="field" id="codeF" hidden><label for="aCode">Код из письма</label><input id="aCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code"><p class="note" id="codeNote"></p></div>
     <p class="err" id="aErr" hidden></p>
     <div style="display:flex;gap:10px"><button class="btn" type="submit" id="authGo" style="flex:1">Продолжить</button><button class="btn ghost" type="button" id="aClose">Закрыть</button></div>
@@ -976,7 +972,7 @@ function renderOrder(){
   var acc=user?'<div class="who"><span>'+esc(user.name)+' · '+esc(user.phone)+'</span><button class="btn ghost small" type="button" id="outBtn">Выйти</button></div>':'<button class="btn ghost" type="button" id="lockBtn">Войти или зарегистрироваться</button>';
   box.innerHTML=steps+'<div class="card ordCard"><p class="ordSum">'+(t.n?'В корзине '+t.n+' поз. на '+rub(t.s):'Корзина пока пуста')+'</p>'+acc+'<button class="btn" type="button" id="ordOpen">'+(t.n?'Открыть корзину':'К меню')+'</button></div>';
   $('ordOpen').onclick=function(){if(total().n)openDrawer();else goTo('menu')};
-  if($('lockBtn'))$('lockBtn').onclick=function(){openAuth('login')};
+  if($('lockBtn'))$('lockBtn').onclick=function(){openAuth()};
   if($('outBtn'))$('outBtn').onclick=function(){user=null;sv('neo_session',null);refreshAuth();renderOrder()};
 }
 
@@ -997,7 +993,7 @@ $('drawer').onclick=function(e){
   var b=e.target.closest('button');if(!b)return;
   if(b.id==='drClose')return closeDrawer();
   if(b.id==='drMenu'){closeDrawer();goTo('menu');return}
-  if(b.id==='drGo'){closeDrawer();if(!user){afterAuth='checkout';openAuth('login')}else openCheckout();return}
+  if(b.id==='drGo'){closeDrawer();if(!user){afterAuth='checkout';openAuth()}else openCheckout();return}
   if(b.dataset.da!==undefined)cart[b.dataset.da]=(cart[b.dataset.da]||0)+1;
   else if(b.dataset.dm!==undefined){cart[b.dataset.dm]--;if(cart[b.dataset.dm]<=0)delete cart[b.dataset.dm]}
   else if(b.dataset.dx!==undefined)delete cart[b.dataset.dx];
@@ -1036,7 +1032,7 @@ $('sheetOv').onclick=function(e){if(e.target===this)closeSheet()};
 
 /* checkout */
 function openCheckout(){
-  if(!user){afterAuth='checkout';openAuth('login');return}
+  if(!user){afterAuth='checkout';openAuth();return}
   $('toast').hidden=true;renderCheckout();$('coOv').hidden=false;syncLock();
 }
 function closeCheckout(){$('coOv').hidden=true;syncLock()}
@@ -1058,7 +1054,7 @@ function renderCheckout(){
 }
 function submitOrder(e){
   e.preventDefault();
-  if(!user){closeCheckout();afterAuth='checkout';openAuth('login');return}
+  if(!user){closeCheckout();afterAuth='checkout';openAuth();return}
   var t=total(),how=document.querySelector('#coBox input[name=how]:checked').value,addr=$('oAddr').value.trim(),err=$('oErr');
   if(!t.n){err.textContent='Корзина пуста.';err.hidden=false;return}
   if(how==='delivery'&&!addr){err.textContent='Укажите адрес доставки.';err.hidden=false;return}
@@ -1124,47 +1120,59 @@ function route(){
 /* auth */
 var mode='login',pending=null;
 function refreshAuth(){$('authBtn').textContent=user?user.name.split(' ')[0]:'Войти'}
-function openAuth(m){setMode(m||'login');$('aErr').hidden=true;$('authOv').hidden=false;syncLock();$('aPhone').focus()}
-function setMode(m){
-  mode=m;$('authTitle').textContent=m==='reg'?'Регистрация':'Вход';$('nameF').hidden=m!=='reg';$('mailF').hidden=m!=='reg';$('agreeF').hidden=m!=='reg';pending=null;$('codeF').hidden=true;$('aCode').value='';$('authGo').textContent='Продолжить';
-  var rs=document.querySelectorAll('input[name=mode]');for(var i=0;i<rs.length;i++)rs[i].checked=rs[i].value===m;
-}
+function openAuth(){resetAuth();$('aErr').hidden=true;$('authOv').hidden=false;syncLock();$('aMail').focus()}
+function resetAuth(){pending=null;$('codeF').hidden=true;$('aCode').value='';$('authGo').textContent='Получить код';$('authGo').disabled=false}
+function setMode(){resetAuth()}
 function normPhone(s){var d=s.replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d.length===11?'+'+d[0]+' '+d.slice(1,4)+' '+d.slice(4,7)+'-'+d.slice(7,9)+'-'+d.slice(9):null}
+var SUPA={url:'',key:''};/* заполните после создания проекта Supabase: адрес проекта и публичный anon-ключ */
+var sbc=null;function getSb(){if(!sbc&&SUPA.url&&SUPA.key&&window.supabase){try{sbc=window.supabase.createClient(SUPA.url,SUPA.key)}catch(x){sbc=null}}return sbc}
+function finishLogin(u){user=u;sv('neo_session',user);$('authOv').hidden=true;syncLock();resetAuth();refreshAuth();renderOrder();if(afterAuth==='checkout'){afterAuth=null;if(total().n)openCheckout()}}
 $('authForm').onsubmit=function(e){
   e.preventDefault();
-  var ph=normPhone($('aPhone').value),pw=$('aPass').value,nm=$('aName').value.trim(),er=$('aErr'),us=ld('neo_users',{});
+  var ml=$('aMail').value.trim().toLowerCase(),nm=$('aName').value.trim(),ph=normPhone($('aPhone').value),er=$('aErr'),us=ld('neo_users',{}),go=$('authGo'),sb=getSb();
   function bad(t){er.textContent=t;er.hidden=false}
-  if(!ph)return bad('Введите телефон полностью, например +7 900 000-00-00.');
-  if(pw.length<6)return bad('Пароль должен быть не короче 6 символов.');
-  if(mode==='reg'){
-    var ml=$('aMail').value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ml))return bad('Введите почту полностью, например name@mail.ru.');
+  if(!pending){
     if(!nm)return bad('Укажите имя.');
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ml))return bad('Введите почту полностью, например name@mail.ru.');
-    if(us[ph])return bad('Этот номер уже зарегистрирован. Выберите «Вход».');
+    if(!ph)return bad('Введите телефон полностью, например +7 900 000-00-00.');
     if(!$('aAgree').checked)return bad('Подтвердите согласие на обработку персональных данных.');
-    if(!pending){
-      var cd=String(Math.floor(100000+Math.random()*900000));
-      pending={ph:ph,ml:ml,cd:cd};
-      $('codeF').hidden=false;$('codeNote').textContent='Демо: письмо не отправляется. Код для проверки: '+cd+'. В рабочей версии он придёт на '+ml+'.';
-      $('authGo').textContent='Подтвердить';er.hidden=true;$('aCode').focus();return;
+    er.hidden=true;
+    if(sb){
+      go.disabled=true;go.textContent='Отправляем…';
+      sb.auth.signInWithOtp({email:ml,options:{shouldCreateUser:true,data:{name:nm,phone:ph}}}).then(function(r){
+        go.disabled=false;
+        if(r.error){go.textContent='Получить код';return bad('Не удалось отправить письмо. Проверьте почту и попробуйте позже.')}
+        pending={ml:ml,nm:nm,ph:ph,real:true};$('codeF').hidden=false;$('codeNote').textContent='Мы отправили код на '+ml+'. Проверьте также папку «Спам».';go.textContent='Войти';$('aCode').focus();
+      }).catch(function(){go.disabled=false;go.textContent='Получить код';bad('Нет связи с сервером. Попробуйте позже.')});
+      return;
     }
-    if($('aCode').value.trim()!==pending.cd)return bad('Код не подходит. Проверьте цифры.');
-    us[ph]={name:nm,pw:pw,mail:ml};sv('neo_users',us);pending=null;
-  }else{
-    if(!us[ph]||us[ph].pw!==pw)return bad('Телефон или пароль не подходят.');
+    var cd=String(Math.floor(100000+Math.random()*900000));
+    pending={ml:ml,nm:nm,ph:ph,cd:cd};$('codeF').hidden=false;
+    $('codeNote').textContent='Демо: письмо не отправляется. Код для проверки: '+cd+'. В рабочей версии он придёт на '+ml+'.';
+    go.textContent='Войти';$('aCode').focus();return;
   }
-  user={name:us[ph].name,phone:ph};sv('neo_session',user);
-  $('authOv').hidden=true;syncLock();$('aPass').value='';refreshAuth();renderOrder();if(afterAuth==='checkout'){afterAuth=null;if(total().n)openCheckout()}
+  var code=$('aCode').value.trim();
+  if(!/^\d{6,8}$/.test(code))return bad('Введите код из письма.');
+  if(pending.real){
+    go.disabled=true;sb=getSb();
+    sb.auth.verifyOtp({email:pending.ml,token:code,type:'email'}).then(function(r){
+      go.disabled=false;
+      if(r.error)return bad('Код не подходит или устарел. Запросите новый.');
+      finishLogin({name:pending.nm,phone:pending.ph,mail:pending.ml});
+    }).catch(function(){go.disabled=false;bad('Нет связи с сервером. Попробуйте позже.')});
+    return;
+  }
+  if(code!==pending.cd)return bad('Код не подходит. Проверьте цифры.');
+  us[pending.ml]={name:pending.nm,phone:pending.ph};sv('neo_users',us);
+  finishLogin({name:pending.nm,phone:pending.ph,mail:pending.ml});
 };
 $('socBox').onclick=function(e){var b=e.target.closest('[data-soc]');if(!b)return;if(!$('socAgree').checked){toast('Отметьте согласие на обработку данных');return}var v=b.dataset.soc;user={name:'Гость '+v,phone:v+' (демо)',via:v};sv('neo_session',user);$('authOv').hidden=true;syncLock();refreshAuth();renderOrder();toast('Вход через '+v+' (демо)');if(afterAuth==='checkout'){afterAuth=null;if(total().n)openCheckout()}};
 $('newRev').onsubmit=function(e){e.preventDefault();var t=$('nrText').value.trim();if(t.length<5)return;var r={id:'u'+Date.now(),s:$('nrSrc').value,r:+$('nrRate').value,t:t,a:$('nrName').value.trim()||'Гость',d:new Date().toLocaleDateString('ru-RU',{month:'long',year:'numeric'})};MYR.push(r);REVIEWS.push(r);sv('neo_myrevs',MYR);cfg.shown[r.id]=true;sv('neo_cfg2',cfg);$('nrText').value='';$('nrName').value='';renderRevs();renderAdmin();toast('Отзыв добавлен на сайт')};
 $('aClose').onclick=function(){$('authOv').hidden=true;afterAuth=null;syncLock()};
 $('authOv').onclick=function(e){if(e.target===this){this.hidden=true;afterAuth=null;syncLock()}};
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(!$('legalOv').hidden){closeLegal();return}$('authOv').hidden=true;afterAuth=null;closeSheet();closeDrawer();closeCheckout()}});
-var ms=document.querySelectorAll('input[name=mode]');
-for(var i=0;i<ms.length;i++)ms[i].onchange=function(){setMode(this.value)};
-['aPhone','aMail'].forEach(function(id){$(id).addEventListener('input',function(){if(pending){pending=null;$('codeF').hidden=true;$('authGo').textContent='Продолжить'}})});
-$('authBtn').onclick=function(){if(user){location.hash='order'}else openAuth('login')};
+['aPhone','aMail'].forEach(function(id){$(id).addEventListener('input',function(){if(pending)resetAuth()})});
+$('authBtn').onclick=function(){if(user){location.hash='order'}else openAuth()};
 
 /* feedback */
 $('fbForm').onsubmit=function(e){
