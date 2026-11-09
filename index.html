@@ -824,9 +824,9 @@ html:not(.js) .nojsbar{position:fixed;left:max(12px,env(safe-area-inset-left,0px
   <form class="modal lt" id="authForm" novalidate role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <h3 id="authTitle">Вход</h3>
     <div class="seg" id="authTabs" style="margin-bottom:14px"><label><input type="radio" name="am" value="login" checked><span>Вход</span></label><label><input type="radio" name="am" value="reg"><span>Регистрация</span></label></div>
-    <div class="field"><label for="aMail">Почта</label><input id="aMail" type="email" inputmode="email" placeholder="name@mail.ru" autocomplete="email"></div>
+    
     <div class="field" id="nameF"><label for="aName">Имя</label><input id="aName" autocomplete="name"></div>
-    <div class="field" id="phoneF"><label for="aPhone">Телефон для связи по заказу</label><input id="aPhone" type="tel" inputmode="tel" placeholder="+7 900 000-00-00" autocomplete="tel"></div>
+    <div class="field" id="phoneF"><label for="aPhone">Телефон</label><input id="aPhone" type="tel" inputmode="tel" placeholder="+7 900 000-00-00" autocomplete="tel"></div>
     <label class="chk" id="agreeF"><input type="checkbox" id="aAgree"><span>Я даю <a href="#" data-legal="consent">согласие на обработку персональных данных</a> и ознакомлен с <a href="#" data-legal="policy">Политикой</a></span></label>
     <div class="field"><label for="aPass">Пароль</label><input id="aPass" type="password" autocomplete="current-password" minlength="8" placeholder="Не короче 8 символов"></div>
     <p class="err" id="aErr" hidden></p>
@@ -1127,19 +1127,20 @@ function route(){
 
 /* auth */
 var mode='login';
-function refreshAuth(){$('authBtn').textContent=user?(user.name||user.mail||'Профиль').split(' ')[0]:'Войти'}
+function refreshAuth(){$('authBtn').textContent=user?(user.name||'Профиль').split(' ')[0]:'Войти'}
 function setMode(m){
   if(m)mode=m;
   var reg=mode==='reg';
   var r=document.querySelector('input[name=am][value='+mode+']');if(r)r.checked=true;
   $('authTitle').textContent=reg?'Регистрация':'Вход';
-  $('nameF').hidden=!reg;$('phoneF').hidden=!reg;$('agreeF').hidden=!reg;
+  $('nameF').hidden=!reg;$('agreeF').hidden=!reg;
   $('aPass').autocomplete=reg?'new-password':'current-password';
   $('authGo').textContent=reg?'Зарегистрироваться':'Войти';
   $('authGo').disabled=false;$('aErr').hidden=true;
 }
-function openAuth(m){setMode(m||'login');$('authOv').hidden=false;syncLock();$('aMail').focus()}
+function openAuth(m){setMode(m||'login');$('authOv').hidden=false;syncLock();$('aPhone').focus()}
 function resetAuth(){$('aPass').value='';$('authGo').disabled=false}
+function phoneMail(ph){return 'p'+ph.replace(/\D/g,'')+'@phone.neo-coffee.app'}
 function normPhone(s){var d=s.replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d.length===11?'+'+d[0]+' '+d.slice(1,4)+' '+d.slice(4,7)+'-'+d.slice(7,9)+'-'+d.slice(9):null}
 var SUPA={url:'https://konoivpiemwgjquhkfqv.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvbm9pdnBpZW13Z2pxdWhrZnF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQyMjc3MjksImV4cCI6MjEwOTgwMzcyOX0.G795yBq7i06CwWrbh4A4bv8Qt5lv0uLBNz-bL2Wt8pU'};/* вставьте anon public ключ из Supabase: Project Settings → API */
 var sbc=null;function getSb(){if(!sbc&&SUPA.url&&SUPA.key&&window.supabase){try{sbc=window.supabase.createClient(SUPA.url,SUPA.key)}catch(x){sbc=null}}return sbc}
@@ -1156,15 +1157,14 @@ document.querySelectorAll('input[name=am]').forEach(function(r){r.addEventListen
 $('authForm').onsubmit=function(e){
   e.preventDefault();
   var reg=mode==='reg';
-  var ml=$('aMail').value.trim().toLowerCase(),pw=$('aPass').value,nm=$('aName').value.trim(),ph=normPhone($('aPhone').value),er=$('aErr'),go=$('authGo'),sb=getSb();
+  var pw=$('aPass').value,nm=$('aName').value.trim(),ph=normPhone($('aPhone').value),er=$('aErr'),go=$('authGo'),sb=getSb(),ml=ph?phoneMail(ph):'';
   function bad(t){er.textContent=t;er.hidden=false}
   function idle(){go.disabled=false;go.textContent=reg?'Зарегистрироваться':'Войти'}
   if(!sb)return bad('Вход временно недоступен: сайт не подключён к серверу. Обратитесь к владельцу сайта.');
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ml))return bad('Введите почту полностью, например name@mail.ru.');
+  if(!ph)return bad('Введите телефон полностью, например +7 900 000-00-00.');
   if(!pw)return bad('Введите пароль.');
   if(reg){
     if(!nm)return bad('Укажите имя.');
-    if(!ph)return bad('Введите телефон полностью, например +7 900 000-00-00.');
     if(pw.length<8)return bad('Пароль должен быть не короче 8 символов.');
     if(!$('aAgree').checked)return bad('Подтвердите согласие на обработку персональных данных.');
   }
@@ -1178,17 +1178,16 @@ $('authForm').onsubmit=function(e){
       if(r.error){
         var m=(r.error.message||'').toLowerCase();
         if(m.indexOf('database error')>-1)return bad(PHONE_TAKEN);
-        if(m.indexOf('already')>-1)return bad('Эта почта уже зарегистрирована. Откройте вкладку «Вход».');
+        if(m.indexOf('already')>-1)return bad('Этот номер телефона уже зарегистрирован. Откройте вкладку «Вход».');
         if(m.indexOf('password')>-1)return bad('Пароль слишком простой. Придумайте надёжнее: не короче 8 символов, буквы и цифры.');
         if(r.error.status===429||m.indexOf('rate')>-1||m.indexOf('seconds')>-1)return bad('Слишком много попыток. Подождите минуту и попробуйте снова.');
         return bad('Не удалось зарегистрироваться. Проверьте данные и попробуйте позже.');
       }
       var u=r.data&&r.data.user;
-      if(u&&u.identities&&u.identities.length===0)return bad('Эта почта уже зарегистрирована. Откройте вкладку «Вход».');
-      if(r.data&&r.data.session){finishLogin({name:nm,phone:ph,mail:ml});resetAuth();return}
+      if(u&&u.identities&&u.identities.length===0)return bad('Этот номер телефона уже зарегистрирован. Откройте вкладку «Вход».');
+      if(r.data&&r.data.session){finishLogin({name:nm,phone:ph});resetAuth();return}
       setMode('login');
-      $('aMail').value=ml;
-      bad('Мы отправили письмо со ссылкой для подтверждения почты. Подтвердите её и войдите с паролем.');
+      bad('Регистрация не завершена: на сервере включено подтверждение почты. Отключите «Confirm email» в Supabase (Authentication → Providers → Email).');
       });
     }).catch(function(){idle();bad('Нет связи с сервером. Попробуйте позже.')});
     return;
@@ -1197,12 +1196,12 @@ $('authForm').onsubmit=function(e){
     idle();
     if(r.error||!r.data||!r.data.session){
       var m=r.error&&(r.error.message||'').toLowerCase()||'';
-      if(m.indexOf('confirm')>-1)return bad('Почта не подтверждена. Откройте письмо от нас и перейдите по ссылке.');
+      if(m.indexOf('confirm')>-1)return bad('Аккаунт не подтверждён на сервере. Отключите «Confirm email» в Supabase.');
       if(r.error&&(r.error.status===429||m.indexOf('rate')>-1))return bad('Слишком много попыток. Подождите минуту и попробуйте снова.');
-      return bad('Неверная почта или пароль.');
+      return bad('Неверный телефон или пароль.');
     }
     var md=(r.data.user&&r.data.user.user_metadata)||{};
-    finishLogin({name:md.name||ml.split('@')[0],phone:md.phone||ml,mail:ml});
+    finishLogin({name:md.name||'Гость',phone:md.phone||ph});
     resetAuth();
   }).catch(function(){idle();bad('Нет связи с сервером. Попробуйте позже.')});
 };
@@ -1356,3 +1355,4 @@ renderTabs();renderMenu();renderBar();renderOrder();renderRevs();refreshAuth();r
 </script>
 </body>
 </html>
+
