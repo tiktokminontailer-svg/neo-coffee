@@ -1189,7 +1189,7 @@ $('authBtn').onclick=function(){if(user){location.hash='order'}else openAuth()};
     var VKID=window.VKIDSDK;
     if(!VKID){console.error('VK SDK не загрузился');return}
     inited=true;
-    VKID.Config.init({app:54886500,redirectUrl:location.origin,responseMode:VKID.ConfigResponseMode.Callback,source:VKID.ConfigSource.LOWCODE,scope:'email'});
+VKID.Config.init({app:54886500,redirectUrl:location.origin,responseMode:VKID.ConfigResponseMode.Callback,source:VKID.ConfigSource.LOWCODE,scope:''});
     new VKID.OAuthList().render({container:$('vkBox'),oauthList:['vkid','mail_ru']})
     .on(VKID.WidgetEvents.ERROR,vkErr)
     .on(VKID.OAuthListInternalEvents.LOGIN_SUCCESS,function(p){
