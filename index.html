@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#F7F0E4">
 <meta name="claude:viewport-fit-sides" content="cover">
 <script>document.documentElement.classList.add("js")</script>
-<script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
+<script src="https://unpkg.com/@vkid/sdk@2.6.10/dist-sdk/umd/index.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" defer></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&display=swap">
 <style>
@@ -1183,13 +1183,14 @@ $('authBtn').onclick=function(){if(user){location.hash='order'}else openAuth()};
     finishLogin({name:nm,phone:via,mail:u.email||'',via:via});
     toast('Вы вошли через '+via);
   }
-  function vkErr(e){console.error('VK error',e);var er=$('aErr');er.textContent='Не удалось войти через VK. Попробуйте позже или войдите по почте.';er.hidden=false}
+  var VK_REDIRECT=location.origin;
+  function vkErr(e){console.error('VK error',e);var er=$('aErr');er.innerHTML='Не удалось войти через VK/Mail.ru. Войдите по почте ниже.<br><small>Для владельца сайта: в настройках VK ID приложения 54886500 укажите базовый домен <b>'+location.host+'</b> и доверенный Redirect URL <b>'+VK_REDIRECT+'</b> (и <b>'+VK_REDIRECT+'/</b>), включите вход через Mail.ru.</small>';er.hidden=false}
   function initVk(){
     if(inited)return;
     var VKID=window.VKIDSDK;
-    if(!VKID){console.error('VK SDK не загрузился');return}
+    if(!VKID){console.error('VK SDK не загрузился');var n=$('vkNote');if(n){n.textContent='VK недоступен — войдите по почте.';n.hidden=false}return}
     inited=true;
-VKID.Config.init({app:54886500,redirectUrl:location.origin,responseMode:VKID.ConfigResponseMode.Callback,source:VKID.ConfigSource.LOWCODE,scope:''});
+    VKID.Config.init({app:54886500,redirectUrl:VK_REDIRECT,responseMode:VKID.ConfigResponseMode.Callback,source:VKID.ConfigSource.LOWCODE,scope:''});
     new VKID.OAuthList().render({container:$('vkBox'),oauthList:['vkid','mail_ru']})
     .on(VKID.WidgetEvents.ERROR,vkErr)
     .on(VKID.OAuthListInternalEvents.LOGIN_SUCCESS,function(p){
