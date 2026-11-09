@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Neo Coffee — кофейня в Краснодаре, ул. Красных Партизан, 469</title>
 <meta name="description" content="Neo Coffee: небольшая кофейня в Краснодаре на Красных Партизан, 469. Кофе, чай, холодные напитки, десерты. Заказ онлайн, с собой и с собакой. Открыто ежедневно с 7–8 до 21:00.">
 <meta property="og:title" content="Neo Coffee — кофейня в Краснодаре">
@@ -6,9 +8,16 @@
 <meta name="theme-color" content="#F7F0E4">
 <meta name="claude:viewport-fit-sides" content="cover">
 <script>document.documentElement.classList.add("js")</script>
-<script src="https://unpkg.com/@vkid/sdk@2.6.10/dist-sdk/umd/index.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" defer></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&display=swap">
+<style>
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{overflow-x:hidden}
+img,svg,video{max-width:100%}
+input,select,textarea{font-size:16px}
+.modal{max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px);overflow-y:auto}
+@media(max-width:720px){button,.btn,.tab,a.btn{min-height:44px}}
+</style>
 <style>
 /* Layout: full-bleed bands alternating ink and paper. Hero lockup from the client's logo files, line-art cup with steam, grain on dark bands. Single committed look, monochrome plus one crema tone. */
 :root{
@@ -486,12 +495,6 @@ footer.site .wrap{align-items:center}
 .nojsbar{background:#FFFBF3;color:var(--esp);border:1px solid var(--line)}
 .err{color:var(--err)}
 
-.soc{display:grid;gap:10px;margin-bottom:18px}
-.soc .btn{width:100%;color:#fff}
-.soc-vk{background:#0077FF}.soc-ml{background:#005FF9;background:#168DE2}
-.soc .note{margin:2px 0 0;font-size:13px}
-.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px;margin:6px 0 0}
-.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
 
 /* v11: motion */
 @keyframes fup{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
@@ -547,7 +550,6 @@ footer.site .wrap{align-items:center}
 @media(max-width:520px){.cookie{flex-direction:column;align-items:stretch;text-align:left}}
 footer.site .lgl a{color:inherit;text-decoration:underline;text-underline-offset:3px}
 html:not(.js) .cookie{display:none}
-.soc .chk{align-items:flex-start;font-size:13px}
 @media(max-width:380px){.nut b{font-size:20px}}
 html:not(.js) .nojsbar{position:fixed;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:60;margin:0;box-shadow:0 14px 40px rgba(42,27,18,.3);font-weight:500}
 </style>
@@ -816,14 +818,14 @@ html:not(.js) .nojsbar{position:fixed;left:max(12px,env(safe-area-inset-left,0px
 <div class="ov" id="authOv" hidden>
   <form class="modal lt" id="authForm" novalidate role="dialog" aria-modal="true" aria-labelledby="authTitle">
     <h3 id="authTitle">Вход по почте</h3>
-    <div class="soc" id="socBox"><label class="chk" style="margin:0"><input type="checkbox" id="socAgree"><span>Я даю <a href="#" data-legal="consent">согласие на обработку персональных данных</a> и ознакомлен с <a href="#" data-legal="policy">Политикой</a></span></label><div id="vkBox" style="opacity:.45;pointer-events:none;margin:10px 0"></div><p class="note" id="vkNote">Отметьте согласие, чтобы войти через VK ID или Mail.ru.</p><p class="or"><span>или по почте</span></p></div>
+    <div class="seg" id="authTabs" style="margin-bottom:14px"><label><input type="radio" name="am" value="login" checked><span>Вход</span></label><label><input type="radio" name="am" value="reg"><span>Регистрация</span></label></div>
     <div class="field"><label for="aMail">Почта</label><input id="aMail" type="email" inputmode="email" placeholder="name@mail.ru" autocomplete="email"></div>
     <div class="field" id="nameF"><label for="aName">Имя</label><input id="aName" autocomplete="name"></div>
     <div class="field" id="phoneF"><label for="aPhone">Телефон для связи по заказу</label><input id="aPhone" type="tel" inputmode="tel" placeholder="+7 900 000-00-00" autocomplete="tel"></div>
     <label class="chk" id="agreeF"><input type="checkbox" id="aAgree"><span>Я даю <a href="#" data-legal="consent">согласие на обработку персональных данных</a> и ознакомлен с <a href="#" data-legal="policy">Политикой</a></span></label>
-    <div class="field" id="codeF" hidden><label for="aCode">Код из письма</label><input id="aCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code"><p class="note" id="codeNote"></p></div>
+    <div class="field" id="codeF" hidden><label for="aCode">Код из письма</label><input id="aCode" inputmode="numeric" maxlength="8" autocomplete="one-time-code"><p class="note" id="codeNote"></p></div>
     <p class="err" id="aErr" hidden></p>
-    <div style="display:flex;gap:10px"><button class="btn" type="submit" id="authGo" style="flex:1">Продолжить</button><button class="btn ghost" type="button" id="aClose">Закрыть</button></div>
+    <div style="display:flex;gap:10px"><button class="btn" type="submit" id="authGo" style="flex:1">Получить код на почту</button><button class="btn ghost" type="button" id="aClose">Закрыть</button></div>
   </form>
 </div>
 
@@ -974,7 +976,7 @@ function renderOrder(){
   box.innerHTML=steps+'<div class="card ordCard"><p class="ordSum">'+(t.n?'В корзине '+t.n+' поз. на '+rub(t.s):'Корзина пока пуста')+'</p>'+acc+'<button class="btn" type="button" id="ordOpen">'+(t.n?'Открыть корзину':'К меню')+'</button></div>';
   $('ordOpen').onclick=function(){if(total().n)openDrawer();else goTo('menu')};
   if($('lockBtn'))$('lockBtn').onclick=function(){openAuth()};
-  if($('outBtn'))$('outBtn').onclick=function(){user=null;sv('neo_session',null);refreshAuth();renderOrder()};
+  if($('outBtn'))$('outBtn').onclick=function(){var sb=getSb();if(sb)sb.auth.signOut().catch(function(){});user=null;sv('neo_session',null);refreshAuth();renderOrder()};
 }
 
 /* drawer */
@@ -1120,95 +1122,82 @@ function route(){
 
 /* auth */
 var mode='login',pending=null;
-function refreshAuth(){$('authBtn').textContent=user?user.name.split(' ')[0]:'Войти'}
-function openAuth(){resetAuth();$('aErr').hidden=true;$('authOv').hidden=false;syncLock();$('aMail').focus()}
-function resetAuth(){pending=null;$('codeF').hidden=true;$('aCode').value='';$('authGo').textContent='Получить код';$('authGo').disabled=false}
-function setMode(){resetAuth()}
+function refreshAuth(){$('authBtn').textContent=user?(user.name||user.mail||'Профиль').split(' ')[0]:'Войти'}
+function setMode(m){
+  if(m)mode=m;
+  var reg=mode==='reg';
+  var r=document.querySelector('input[name=am][value='+mode+']');if(r)r.checked=true;
+  $('authTitle').textContent=reg?'Регистрация':'Вход по почте';
+  $('nameF').hidden=!reg;$('phoneF').hidden=!reg;$('agreeF').hidden=!reg;
+  $('aErr').hidden=true;resetAuth();
+}
+function openAuth(m){setMode(m||'login');$('authOv').hidden=false;syncLock();$('aMail').focus()}
+function resetAuth(){pending=null;$('codeF').hidden=true;$('aCode').value='';$('authGo').textContent='Получить код на почту';$('authGo').disabled=false}
 function normPhone(s){var d=s.replace(/\D/g,'');if(d.length===11&&d[0]==='8')d='7'+d.slice(1);if(d.length===10)d='7'+d;return d.length===11?'+'+d[0]+' '+d.slice(1,4)+' '+d.slice(4,7)+'-'+d.slice(7,9)+'-'+d.slice(9):null}
-var SUPA={url:'https://konoivpiemwgjquhkfqv.supabase.co',key:'ВСТАВЬТЕ_СЮДА_ANON_PUBLIC_КЛЮЧ'};/* заполните после создания проекта Supabase: адрес проекта и публичный anon-ключ */
-var sbc=null;function getSb(){if(SUPA.key.indexOf('ВСТАВЬТЕ')===0)return null;if(!sbc&&SUPA.url&&SUPA.key&&window.supabase){try{sbc=window.supabase.createClient(SUPA.url,SUPA.key)}catch(x){sbc=null}}return sbc}
+var SUPA={url:'https://konoivpiemwgjquhkfqv.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtvbm9pdnBpZW13Z2pxdWhrZnF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQyMjc3MjksImV4cCI6MjEwOTgwMzcyOX0.G795yBq7i06CwWrbh4A4bv8Qt5lv0uLBNz-bL2Wt8pU'};/* вставьте anon public ключ из Supabase: Project Settings → API */
+var sbc=null;function getSb(){if(!sbc&&SUPA.url&&SUPA.key&&window.supabase){try{sbc=window.supabase.createClient(SUPA.url,SUPA.key)}catch(x){sbc=null}}return sbc}
 function finishLogin(u){user=u;sv('neo_session',user);$('authOv').hidden=true;syncLock();resetAuth();refreshAuth();renderOrder();if(afterAuth==='checkout'){afterAuth=null;if(total().n)openCheckout()}}
+function dropSession(){user=null;sv('neo_session',null);refreshAuth();renderOrder()}
+/* сессия действительна только если она подтверждена кодом с почты */
+window.addEventListener('load',function(){
+  if(!user)return;
+  var sb=getSb();
+  if(!sb){dropSession();return}
+  sb.auth.getSession().then(function(r){if(!r.data||!r.data.session)dropSession()}).catch(function(){});
+});
+document.querySelectorAll('input[name=am]').forEach(function(r){r.addEventListener('change',function(){setMode(this.value)})});
 $('authForm').onsubmit=function(e){
   e.preventDefault();
-  var ml=$('aMail').value.trim().toLowerCase(),nm=$('aName').value.trim(),ph=normPhone($('aPhone').value),er=$('aErr'),us=ld('neo_users',{}),go=$('authGo'),sb=getSb();
+  var reg=mode==='reg';
+  var ml=$('aMail').value.trim().toLowerCase(),nm=$('aName').value.trim(),ph=normPhone($('aPhone').value),er=$('aErr'),go=$('authGo'),sb=getSb();
   function bad(t){er.textContent=t;er.hidden=false}
+  if(!sb)return bad('Вход временно недоступен: на сайте не подключена отправка писем. Обратитесь к владельцу сайта.');
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(ml))return bad('Введите почту полностью, например name@mail.ru.');
   if(!pending){
-    if(!nm)return bad('Укажите имя.');
-    if(!ph)return bad('Введите телефон полностью, например +7 900 000-00-00.');
-    if(!$('aAgree').checked)return bad('Подтвердите согласие на обработку персональных данных.');
-    er.hidden=true;
-    if(sb){
-      go.disabled=true;go.textContent='Отправляем…';
-      sb.auth.signInWithOtp({email:ml,options:{shouldCreateUser:true,data:{name:nm,phone:ph}}}).then(function(r){
-        go.disabled=false;
-        if(r.error){go.textContent='Получить код';return bad('Не удалось отправить письмо. Проверьте почту и попробуйте позже.')}
-        pending={ml:ml,nm:nm,ph:ph,real:true};$('codeF').hidden=false;$('codeNote').textContent='Мы отправили код на '+ml+'. Проверьте также папку «Спам».';go.textContent='Войти';$('aCode').focus();
-      }).catch(function(){go.disabled=false;go.textContent='Получить код';bad('Нет связи с сервером. Попробуйте позже.')});
-      return;
+    if(reg){
+      if(!nm)return bad('Укажите имя.');
+      if(!ph)return bad('Введите телефон полностью, например +7 900 000-00-00.');
+      if(!$('aAgree').checked)return bad('Подтвердите согласие на обработку персональных данных.');
     }
-    var cd=String(Math.floor(100000+Math.random()*900000));
-    pending={ml:ml,nm:nm,ph:ph,cd:cd};$('codeF').hidden=false;
-    $('codeNote').textContent='Демо: письмо не отправляется. Код для проверки: '+cd+'. В рабочей версии он придёт на '+ml+'.';
-    go.textContent='Войти';$('aCode').focus();return;
+    er.hidden=true;
+    go.disabled=true;go.textContent='Отправляем…';
+    var opts={shouldCreateUser:reg};
+    if(reg)opts.data={name:nm,phone:ph};
+    sb.auth.signInWithOtp({email:ml,options:opts}).then(function(r){
+      go.disabled=false;
+      if(r.error){
+        go.textContent='Получить код на почту';
+        var m=(r.error.message||'').toLowerCase();
+        if(!reg&&(m.indexOf('signups not allowed')>-1||m.indexOf('not found')>-1))return bad('Аккаунт с такой почтой не найден. Откройте вкладку «Регистрация».');
+        if(r.error.status===429||m.indexOf('rate')>-1||m.indexOf('seconds')>-1)return bad('Слишком много попыток. Подождите минуту и попробуйте снова.');
+        return bad('Не удалось отправить письмо. Проверьте адрес и попробуйте позже.');
+      }
+      pending={ml:ml,nm:nm,ph:ph};
+      $('codeF').hidden=false;
+      $('codeNote').textContent='Мы отправили код на '+ml+'. Проверьте также папку «Спам».';
+      go.textContent=reg?'Подтвердить и зарегистрироваться':'Войти';
+      $('aCode').focus();
+    }).catch(function(){go.disabled=false;go.textContent='Получить код на почту';bad('Нет связи с сервером. Попробуйте позже.')});
+    return;
   }
   var code=$('aCode').value.trim();
   if(!/^\d{6,8}$/.test(code))return bad('Введите код из письма.');
-  if(pending.real){
-    go.disabled=true;sb=getSb();
-    sb.auth.verifyOtp({email:pending.ml,token:code,type:'email'}).then(function(r){
-      go.disabled=false;
-      if(r.error)return bad('Код не подходит или устарел. Запросите новый.');
-      finishLogin({name:pending.nm,phone:pending.ph,mail:pending.ml});
-    }).catch(function(){go.disabled=false;bad('Нет связи с сервером. Попробуйте позже.')});
-    return;
-  }
-  if(code!==pending.cd)return bad('Код не подходит. Проверьте цифры.');
-  us[pending.ml]={name:pending.nm,phone:pending.ph};sv('neo_users',us);
-  finishLogin({name:pending.nm,phone:pending.ph,mail:pending.ml});
+  er.hidden=true;go.disabled=true;
+  sb.auth.verifyOtp({email:pending.ml,token:code,type:'email'}).then(function(r){
+    go.disabled=false;
+    if(r.error||!r.data||!r.data.session)return bad('Код не подходит или устарел. Запросите новый.');
+    var md=(r.data.user&&r.data.user.user_metadata)||{};
+    var name=md.name||pending.nm||pending.ml.split('@')[0];
+    var phone=md.phone||pending.ph||'';
+    finishLogin({name:name,phone:phone||pending.ml,mail:pending.ml});
+  }).catch(function(){go.disabled=false;bad('Нет связи с сервером. Попробуйте позже.')});
 };
-$('socBox').onclick=function(e){var b=e.target.closest('[data-soc]');if(!b)return;if(!$('socAgree').checked){toast('Отметьте согласие на обработку данных');return}var v=b.dataset.soc;user={name:'Гость '+v,phone:v+' (демо)',via:v};sv('neo_session',user);$('authOv').hidden=true;syncLock();refreshAuth();renderOrder();toast('Вход через '+v+' (демо)');if(afterAuth==='checkout'){afterAuth=null;if(total().n)openCheckout()}};
 $('newRev').onsubmit=function(e){e.preventDefault();var t=$('nrText').value.trim();if(t.length<5)return;var r={id:'u'+Date.now(),s:$('nrSrc').value,r:+$('nrRate').value,t:t,a:$('nrName').value.trim()||'Гость',d:new Date().toLocaleDateString('ru-RU',{month:'long',year:'numeric'})};MYR.push(r);REVIEWS.push(r);sv('neo_myrevs',MYR);cfg.shown[r.id]=true;sv('neo_cfg2',cfg);$('nrText').value='';$('nrName').value='';renderRevs();renderAdmin();toast('Отзыв добавлен на сайт')};
 $('aClose').onclick=function(){$('authOv').hidden=true;afterAuth=null;syncLock()};
 $('authOv').onclick=function(e){if(e.target===this){this.hidden=true;afterAuth=null;syncLock()}};
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){if(!$('legalOv').hidden){closeLegal();return}$('authOv').hidden=true;afterAuth=null;closeSheet();closeDrawer();closeCheckout()}});
 ['aPhone','aMail'].forEach(function(id){$(id).addEventListener('input',function(){if(pending)resetAuth()})});
 $('authBtn').onclick=function(){if(user){location.hash='order'}else openAuth()};
-/* VK ID / Mail.ru */
-(function(){
-  var inited=false;
-  function vkLogin(info,via){
-    var u=(info&&info.user)||{};
-    var nm=((u.first_name||'')+' '+(u.last_name||'')).trim()||('Гость '+via);
-    finishLogin({name:nm,phone:via,mail:u.email||'',via:via});
-    toast('Вы вошли через '+via);
-  }
-  var VK_REDIRECT=location.origin;
-  function vkErr(e){console.error('VK error',e);var er=$('aErr');er.innerHTML='Не удалось войти через VK/Mail.ru. Войдите по почте ниже.<br><small>Для владельца сайта: в настройках VK ID приложения 54886500 укажите базовый домен <b>'+location.host+'</b> и доверенный Redirect URL <b>'+VK_REDIRECT+'</b> (и <b>'+VK_REDIRECT+'/</b>), включите вход через Mail.ru.</small>';er.hidden=false}
-  function initVk(){
-    if(inited)return;
-    var VKID=window.VKIDSDK;
-    if(!VKID){console.error('VK SDK не загрузился');var n=$('vkNote');if(n){n.textContent='VK недоступен — войдите по почте.';n.hidden=false}return}
-    inited=true;
-    VKID.Config.init({app:54886500,redirectUrl:VK_REDIRECT,responseMode:VKID.ConfigResponseMode.Callback,source:VKID.ConfigSource.LOWCODE,scope:''});
-    new VKID.OAuthList().render({container:$('vkBox'),oauthList:['vkid','mail_ru']})
-    .on(VKID.WidgetEvents.ERROR,vkErr)
-    .on(VKID.OAuthListInternalEvents.LOGIN_SUCCESS,function(p){
-      var via=(p&&p.provider==='mail_ru')?'Mail.ru':'VK ID';
-      VKID.Auth.exchangeCode(p.code,p.device_id).then(function(d){
-        return VKID.Auth.userInfo(d.access_token).then(function(i){vkLogin(i,via)},function(){vkLogin(null,via)});
-      }).catch(vkErr);
-    });
-  }
-  window.addEventListener('load',initVk);
-  $('socAgree').addEventListener('change',function(){
-    var on=this.checked,b=$('vkBox');
-    b.style.opacity=on?'1':'.45';b.style.pointerEvents=on?'auto':'none';
-    $('vkNote').hidden=on;
-  });
-})();
-
-
 /* feedback */
 $('fbForm').onsubmit=function(e){
   e.preventDefault();
